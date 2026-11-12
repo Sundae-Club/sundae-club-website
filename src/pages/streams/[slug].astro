@@ -1,0 +1,82 @@
+---
+import ChapterList from "../../components/ChapterList.astro";
+import YouTubeEmbed from "../../components/YouTubeEmbed.astro";
+import Base from "../../layouts/Base.astro";
+import { loadCatalog } from "../../lib/catalog";
+import { formatStreamDate, utcDateISO } from "../../lib/time";
+
+export async function getStaticPaths() {
+  const { streams } = await loadCatalog();
+  return streams.map((stream) => ({
+    params: { slug: stream.id },
+    props: { stream },
+  }));
+}
+
+const { stream } = Astro.props;
+const { topicById } = await loadCatalog();
+const published = new Date(stream.data.date);
+const playerId = "stream-player";
+---
+
+<Base title={stream.data.title} description={stream.data.summary}>
+  <article class="page">
+    <div class="wrap">
+      {
+        stream.data.sample && (
+          <p class="banner" role="note">
+            Sample stream. Not a real episode.
+            <span class="banner-file">
+              Replace <code>src/content/streams/{stream.id}.md</code>.
+            </span>
+          </p>
+        )
+      }
+      <h1 class="page-title">{stream.data.title}</h1>
+      <p class="date">
+        <time datetime={utcDateISO(published)}>{formatStreamDate(published)}</time>
+      </p>
+      <YouTubeEmbed
+        videoId={stream.data.youtubeId}
+        title={stream.data.sample
+          ? `Sample placeholder video for ${stream.data.title}. Not a Sundae Club stream.`
+          : stream.data.title}
+        playerId={playerId}
+        note={stream.data.sample ? "Sample placeholder video. Not a Sundae Club stream." : undefined}
+      />
+      <p class="summary">{stream.data.summary}</p>
+      {
+        stream.data.topics.length > 0 && (
+          <section class="block" aria-labelledby="topics-heading">
+            <h2 class="subhead" id="topics-heading">
+              Topics
+            </h2>
+            <ul class="chips">
+              {stream.data.topics.map((slug) => {
+                const topic = topicById.get(slug);
+                return (
+                  <li>
+                    <a class="chip" href={`/topics/${slug}`}>
+                      {topic?.data.title ?? slug}
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        )
+      }
+      {
+        stream.data.chapters.length > 0 && (
+          <section class="block" aria-labelledby="chapters-heading">
+            <h2 class="subhead" id="chapters-heading">
+              Chapters
+            </h2>
+            <p class="hint">Select a chapter to start the video at that time.</p>
+            <ChapterList chapters={stream.data.chapters} playerId={playerId} />
+          </section>
+        )
+      }
+    </div>
+  </article>
+</Base>

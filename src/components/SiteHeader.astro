@@ -1,0 +1,19 @@
+---
+const path = Astro.url.pathname;
+const onTopics = path === "/topics" || path.startsWith("/topics/");
+---
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="/">
+      <span class="brand-mark">
+        <img src="/logo.png" alt="" width="236" height="465" />
+      </span>
+      Sundae Club
+    </a>
+    <nav class="nav" aria-label="Primary">
+      <a href="/#streams" aria-current={path === "/" ? "page" : undefined}>Streams</a>
+      <a href="/topics" aria-current={onTopics ? "page" : undefined}>Topics</a>
+    </nav>
+  </div>
+</header>

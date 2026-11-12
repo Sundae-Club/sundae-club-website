@@ -1,0 +1,58 @@
+---
+import Hero from "../components/Hero.astro";
+import Base from "../layouts/Base.astro";
+import { loadCatalog } from "../lib/catalog";
+import { formatStreamDate, utcDateISO } from "../lib/time";
+
+const { streams, topicById } = await loadCatalog();
+---
+
+<Base
+  title="Sundae Club"
+  description="Livestreams for learning. AI software development, design & production."
+>
+  <Hero />
+  <section class="page" id="streams">
+    <div class="wrap">
+      <h2 class="section-title">Streams</h2>
+      {
+        streams.length === 0 ? (
+          <p class="lede">No streams yet.</p>
+        ) : (
+          <ol class="stream-list">
+            {streams.map((stream) => (
+              <li>
+                <article>
+                  <p class="kicker">
+                    <time datetime={utcDateISO(stream.data.date)}>
+                      {formatStreamDate(stream.data.date)}
+                    </time>
+                    {stream.data.sample && <span class="flag">Sample</span>}
+                  </p>
+                  <h3>
+                    <a href={`/streams/${stream.id}`}>{stream.data.title}</a>
+                  </h3>
+                  <p class="summary">{stream.data.summary}</p>
+                  {stream.data.topics.length > 0 && (
+                    <ul class="chips stream-topics">
+                      {stream.data.topics.map((slug) => {
+                        const topic = topicById.get(slug);
+                        return (
+                          <li>
+                            <a class="chip" href={`/topics/${slug}`}>
+                              {topic?.data.title ?? slug}
+                            </a>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                </article>
+              </li>
+            ))}
+          </ol>
+        )
+      }
+    </div>
+  </section>
+</Base>
