@@ -1,0 +1,28 @@
+---
+import Base from "../../layouts/Base.astro";
+import { loadCatalog } from "../../lib/catalog";
+
+const { topics } = await loadCatalog();
+---
+
+<Base title="Topics" description="Topics from Sundae Club livestreams.">
+  <section class="page">
+    <div class="wrap">
+      <h1 class="section-title">Topics</h1>
+      {
+        topics.length === 0 ? (
+          <p class="lede">No topics yet.</p>
+        ) : (
+          <ul class="topic-list">
+            {topics.map((topic) => (
+              <li>
+                <a href={`/topics/${topic.id}`}>{topic.data.title}</a>
+                {topic.data.sample && <span class="flag">Sample</span>}
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </div>
+  </section>
+</Base>

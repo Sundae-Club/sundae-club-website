@@ -1,0 +1,53 @@
+---
+import { formatTimestamp } from "../lib/time";
+
+interface Chapter {
+  title: string;
+  start: number;
+}
+
+interface Props {
+  chapters: Chapter[];
+  playerId: string;
+}
+
+const { chapters, playerId } = Astro.props;
+---
+
+<ol class="chapters">
+  {
+    chapters.map((chapter) => (
+      <li>
+        <button type="button" data-player={playerId} data-start={chapter.start}>
+          <span class="chapters-time">{formatTimestamp(chapter.start)}</span>
+          <span>{chapter.title}</span>
+        </button>
+      </li>
+    ))
+  }
+</ol>
+
+<script>
+  document.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    const button = target.closest("button[data-start]");
+    if (!(button instanceof HTMLButtonElement)) return;
+    const playerId = button.dataset.player;
+    const start = button.dataset.start;
+    if (!playerId || !start || !/^\d+$/.test(start)) return;
+    const iframe = document.getElementById(playerId);
+    if (!(iframe instanceof HTMLIFrameElement)) return;
+    const base = iframe.dataset.embedBase;
+    if (!base) return;
+    const next = new URL(base);
+    next.searchParams.set("rel", "0");
+    next.searchParams.set("start", start);
+    if (iframe.src !== next.toString()) iframe.src = next.toString();
+    const group = button.closest("ol");
+    group?.querySelectorAll("button[data-start]").forEach((item) => {
+      item.removeAttribute("aria-current");
+    });
+    button.setAttribute("aria-current", "true");
+  });
+</script>

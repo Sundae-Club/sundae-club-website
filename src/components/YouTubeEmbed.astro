@@ -1,0 +1,30 @@
+---
+import { youtubeEmbedBase, youtubeEmbedUrl } from "../lib/youtube";
+
+interface Props {
+  videoId: string;
+  title: string;
+  start?: number;
+  end?: number;
+  playerId?: string;
+  note?: string;
+}
+
+const { videoId, title, start, end, playerId, note } = Astro.props;
+const src = playerId ? youtubeEmbedUrl(videoId) : youtubeEmbedUrl(videoId, { start, end });
+---
+
+<figure class="embed-block">
+  {note && <figcaption class="embed-note">{note}</figcaption>}
+  <div class="embed">
+    <iframe
+      id={playerId}
+      src={src}
+      data-embed-base={playerId ? youtubeEmbedBase(videoId) : undefined}
+      title={title}
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      allowfullscreen
+      loading="eager"
+      referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+</figure>

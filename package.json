@@ -1,0 +1,17 @@
+{
+  "name": "sundae-club-website",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "ASTRO_TELEMETRY_DISABLED=1 astro dev",
+    "build": "ASTRO_TELEMETRY_DISABLED=1 astro build",
+    "preview": "ASTRO_TELEMETRY_DISABLED=1 astro preview",
+    "pages:deploy": "npm run build && (wrangler pages project create sundae-club --production-branch main --force || true) && wrangler pages deploy --branch main --commit-dirty --force"
+  },
+  "dependencies": {
+    "astro": "^7.4.11"
+  },
+  "devDependencies": {
+    "wrangler": "^4.161.0"
+  }
+}

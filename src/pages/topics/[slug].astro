@@ -1,0 +1,72 @@
+---
+import { render } from "astro:content";
+import YouTubeEmbed from "../../components/YouTubeEmbed.astro";
+import Base from "../../layouts/Base.astro";
+import { loadCatalog } from "../../lib/catalog";
+import { formatTimestamp } from "../../lib/time";
+
+export async function getStaticPaths() {
+  const { topics } = await loadCatalog();
+  return topics.map((topic) => ({
+    params: { slug: topic.id },
+    props: { topic },
+  }));
+}
+
+const { topic } = Astro.props;
+const { Content } = await render(topic);
+const description = topic.data.sample
+  ? `Sample topic: ${topic.data.title}`
+  : topic.data.title;
+---
+
+<Base title={topic.data.title} description={description}>
+  <article class="page">
+    <div class="wrap">
+      {
+        topic.data.sample && (
+          <p class="banner" role="note">
+            Sample topic. Not the finished page.
+            <span class="banner-file">
+              Replace <code>src/content/topics/{topic.id}.md</code>.
+            </span>
+          </p>
+        )
+      }
+      <h1 class="page-title">{topic.data.title}</h1>
+      <div class="answer">
+        <Content />
+      </div>
+      <section class="block" aria-labelledby="clips-heading">
+        <h2 class="subhead" id="clips-heading">
+          Clips
+        </h2>
+        <div class="clips">
+          {
+            topic.data.clips.map((clip) => (
+              <section>
+                <h3>{clip.title}</h3>
+                <p class="clip-time">
+                  <time datetime={`PT${clip.start}S`}>{formatTimestamp(clip.start)}</time>
+                  –
+                  <time datetime={`PT${clip.end}S`}>{formatTimestamp(clip.end)}</time>
+                </p>
+                <YouTubeEmbed
+                  videoId={clip.youtubeId}
+                  title={clip.title}
+                  start={clip.start}
+                  end={clip.end}
+                  note={
+                    topic.data.sample
+                      ? "Sample placeholder clip. Not a Sundae Club stream."
+                      : undefined
+                  }
+                />
+              </section>
+            ))
+          }
+        </div>
+      </section>
+    </div>
+  </article>
+</Base>
