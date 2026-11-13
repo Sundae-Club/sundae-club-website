@@ -3,6 +3,6 @@
   "name": "sundae-club",
   "pages_build_output_dir": "./dist",
   "compatibility_date": "2026-11-12"
-  // Production hostname is https://sundaeclub.co. Wrangler 4 has no Pages
-  // custom-domain command; attach the apex in the Pages dashboard after deploy.
+  // Canonical hostname is https://www.sundaeclub.co. The apex redirects there.
+  // Wrangler 4 has no Pages custom-domain command; attach domains in the dashboard.
 }
